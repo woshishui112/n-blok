@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N-Back Pro | 慢速版 (4秒)</title>
+    <title>N-Back Pro | 3秒标准版</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- 全局变量与UI设计 (保持深色专注模式) --- */
+        /* --- 全局变量与UI设计 (深色专注模式) --- */
         :root {
             --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             --card-bg: rgba(30, 41, 59, 0.7);
@@ -112,11 +112,11 @@
             -webkit-text-fill-color: transparent;
             display: none;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
+            0% { transform: scale(0.6); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
@@ -311,10 +311,10 @@
     </div>
 
 <script>
-    // --- 这里是修改的核心区域 ---
+    // --- 3秒黄金标准配置 ---
     const TOTAL_TRIALS = 50;
-    const INTERVAL_MS = 4000; // 修改为 4秒
-    const SHOW_MS = 3000;     // 修改为 3秒 (留出1秒空白)
+    const INTERVAL_MS = 3000; // 总周期：3秒
+    const SHOW_MS = 2000;     // 显示：2秒 (留1秒处理空白期)
     const MATCH_RATE = 0.3;
     const LETTER_POOL = ['A', 'B', 'C', 'H', 'K', 'L', 'M', 'Q', 'R', 'S', 'T', 'X'];
 
@@ -359,7 +359,7 @@
     }
 
     function nextTurn() {
-        // 检测上一轮是否漏掉
+        // 检测漏掉
         if (currentTrial > 0 && !hasResponded) {
             const lastIndex = sequence.length - 1;
             const targetIndex = lastIndex - nLevel;
@@ -393,9 +393,9 @@
         const pct = (currentTrial / TOTAL_TRIALS) * 100;
         progressBar.style.width = `${pct}%`;
 
-        // 设置显示时长 (3秒后消失)
+        // 显示时间结束
         hideTimer = setTimeout(() => { letterEl.style.display = 'none'; }, SHOW_MS);
-        // 设置总间隔 (4秒后下一题)
+        // 下一题时间
         timer = setTimeout(nextTurn, INTERVAL_MS);
     }
 
@@ -443,9 +443,10 @@
         document.getElementById('stat-wrong').innerText = stats.wrong;
         document.getElementById('stat-miss').innerText = stats.miss;
         
-        let comment = "非常稳！";
-        if (stats.miss > 5) comment = "提示：慢速模式下尽量不要漏掉哦。";
-        else if (score > 350) comment = "完美表现！这个速度对你来说太简单了？";
+        let comment = "继续保持！";
+        if (stats.miss > 10) comment = "提示：漏掉较多，尝试用内心的声音默念字母。";
+        else if (stats.wrong > 10) comment = "提示：别急，看准了再下手。";
+        else if (score > 350) comment = "状态神勇！你的大脑现在非常敏锐！";
         
         document.getElementById('final-comment').innerText = comment;
         document.getElementById('result-modal').style.display = 'flex';
