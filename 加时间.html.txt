@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-Back Pro | 慢速版 (4秒)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 全局变量与UI设计 (保持深色专注模式) --- */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent-primary: #38bdf8;
+            --accent-success: #4ade80;
+            --accent-error: #f87171;
+            --btn-color: #e2e8f0;
+            --btn-shadow: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .header {
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .setting-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        input[type=number] {
+            background: transparent;
+            border: none;
+            color: var(--accent-primary);
+            font-weight: bold;
+            font-size: 16px;
+            width: 30px;
+            text-align: center;
+        }
+        input:focus { outline: none; }
+
+        .score-tag {
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .progress-track {
+            width: 100%;
+            max-width: 400px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-bottom: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-success));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px var(--accent-primary);
+        }
+
+        .game-stage {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            background: var(--card-bg);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        #current-letter {
+            font-size: 120px;
+            font-weight: 700;
+            background: linear-gradient(180deg, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: none;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        #feedback {
+            height: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .show-feedback { opacity: 1 !important; }
+        .text-success { color: var(--accent-success); text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
+        .text-error { color: var(--accent-error); text-shadow: 0 0 10px rgba(248, 113, 113, 0.4); }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        #match-btn {
+            position: relative;
+            width: 240px;
+            height: 72px;
+            background: var(--btn-color);
+            border: none;
+            border-radius: 36px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            cursor: pointer;
+            box-shadow: 0 8px 0 var(--btn-shadow), 0 15px 20px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #match-btn:active, .btn-pressed {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 var(--btn-shadow), 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        #match-btn:disabled {
+            background: #475569;
+            color: #94a3b8;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: translateY(6px);
+        }
+
+        #start-btn {
+            padding: 14px 40px;
+            background: linear-gradient(90deg, var(--accent-primary), #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+            transition: transform 0.2s;
+        }
+        #start-btn:hover { transform: translateY(-2px); }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-card {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            width: 320px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin: 30px 0;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.03);
+            padding: 15px 5px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .stat-num { display: block; font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+        .stat-label { font-size: 11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .btn-restart {
+            width: 100%;
+            padding: 15px;
+            background: white;
+            color: #0f172a;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-restart:hover { opacity: 0.9; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .key-hint {
+            font-size: 12px;
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="setting-group" id="settings-panel">
+            <span style="font-size:14px; color:var(--text-sub)">N-Back</span>
+            <input type="number" id="n-level" value="2" min="1" max="5">
+        </div>
+        <div class="score-tag" id="score-display">SCORE: 0</div>
+    </div>
+
+    <div class="progress-track">
+        <div class="progress-fill" id="progress-bar"></div>
+    </div>
+
+    <div class="game-stage">
+        <div id="current-letter">A</div>
+    </div>
+
+    <div id="feedback"></div>
+
+    <div class="controls">
+        <button id="match-btn" disabled onmousedown="checkMatch()">
+            <span>🎯 匹配</span>
+            <span class="key-hint">SPACE</span>
+        </button>
+        <button id="start-btn" onclick="startGame()">开始训练</button>
+    </div>
+
+    <div id="result-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h2 style="margin:0; font-size:24px;">训练报告</h2>
+            <p style="color:var(--text-sub); font-size:14px; margin-top:5px;">本次专注力表现</p>
+
+            <div style="margin: 20px 0;">
+                <span style="font-size:48px; font-weight:700; color:var(--accent-primary);" id="final-score">0</span>
+                <div style="font-size:12px; color:var(--text-sub);">总分</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span class="stat-num" style="color:var(--accent-success)" id="stat-hits">0</span>
+                    <span class="stat-label">命中</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-num" style="color:var(--accent-error)" id="stat-wrong">0</span>
+                    <span class="stat-label">误触</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-num" style="color:#fbbf24" id="stat-miss">0</span>
+                    <span class="stat-label">漏掉</span>
+                </div>
+            </div>
+
+            <p id="final-comment" style="font-size:13px; color:var(--text-sub); margin-bottom:25px; line-height:1.5;">...</p>
+            
+            <button class="btn-restart" onclick="closeModal()">再次挑战</button>
+        </div>
+    </div>
+
+<script>
+    // --- 这里是修改的核心区域 ---
+    const TOTAL_TRIALS = 50;
+    const INTERVAL_MS = 4000; // 修改为 4秒
+    const SHOW_MS = 3000;     // 修改为 3秒 (留出1秒空白)
+    const MATCH_RATE = 0.3;
+    const LETTER_POOL = ['A', 'B', 'C', 'H', 'K', 'L', 'M', 'Q', 'R', 'S', 'T', 'X'];
+
+    // 状态管理
+    let nLevel = 2;
+    let sequence = [];
+    let currentTrial = 0;
+    let score = 0;
+    let stats = { hits: 0, wrong: 0, miss: 0 };
+
+    let timer = null;
+    let hideTimer = null;
+    let isGameRunning = false;
+    let hasResponded = false;
+    let currentLetter = "";
+
+    const letterEl = document.getElementById('current-letter');
+    const matchBtn = document.getElementById('match-btn');
+    const feedbackEl = document.getElementById('feedback');
+    const progressBar = document.getElementById('progress-bar');
+    const scoreDisplay = document.getElementById('score-display');
+    const settingsPanel = document.getElementById('settings-panel');
+    const startBtn = document.getElementById('start-btn');
+
+    function startGame() {
+        nLevel = parseInt(document.getElementById('n-level').value);
+        sequence = [];
+        currentTrial = 0;
+        score = 0;
+        stats = { hits: 0, wrong: 0, miss: 0 };
+        isGameRunning = true;
+        
+        scoreDisplay.innerText = "SCORE: 0";
+        scoreDisplay.style.color = "var(--text-main)";
+        progressBar.style.width = "0%";
+        startBtn.style.display = 'none';
+        settingsPanel.style.opacity = '0.3';
+        matchBtn.disabled = false;
+        feedbackEl.classList.remove('show-feedback');
+        
+        nextTurn();
+    }
+
+    function nextTurn() {
+        // 检测上一轮是否漏掉
+        if (currentTrial > 0 && !hasResponded) {
+            const lastIndex = sequence.length - 1;
+            const targetIndex = lastIndex - nLevel;
+            if (targetIndex >= 0 && sequence[lastIndex] === sequence[targetIndex]) {
+                stats.miss++;
+            }
+        }
+
+        if (currentTrial >= TOTAL_TRIALS) {
+            endGame();
+            return;
+        }
+
+        hasResponded = false;
+        feedbackEl.classList.remove('show-feedback');
+        
+        let newChar;
+        if (sequence.length >= nLevel && Math.random() < MATCH_RATE) {
+            newChar = sequence[sequence.length - nLevel]; 
+        } else {
+            newChar = LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
+        }
+        
+        currentLetter = newChar;
+        sequence.push(currentLetter);
+        
+        letterEl.innerText = currentLetter;
+        letterEl.style.display = 'block';
+        
+        currentTrial++;
+        const pct = (currentTrial / TOTAL_TRIALS) * 100;
+        progressBar.style.width = `${pct}%`;
+
+        // 设置显示时长 (3秒后消失)
+        hideTimer = setTimeout(() => { letterEl.style.display = 'none'; }, SHOW_MS);
+        // 设置总间隔 (4秒后下一题)
+        timer = setTimeout(nextTurn, INTERVAL_MS);
+    }
+
+    function checkMatch() {
+        if (!isGameRunning || hasResponded) return;
+        hasResponded = true;
+
+        const targetIndex = sequence.length - 1 - nLevel;
+        
+        if (targetIndex >= 0 && sequence[targetIndex] === currentLetter) {
+            score += 10;
+            stats.hits++;
+            showFeedback("✨ 完美匹配", "text-success");
+            triggerGlow("success");
+        } else {
+            score -= 5;
+            stats.wrong++;
+            showFeedback("❌ 误触", "text-error");
+            triggerGlow("error");
+        }
+        scoreDisplay.innerText = `SCORE: ${score}`;
+    }
+
+    function showFeedback(text, className) {
+        feedbackEl.innerText = text;
+        feedbackEl.className = className;
+        feedbackEl.classList.add('show-feedback');
+    }
+
+    function triggerGlow(type) {
+        const color = type === 'success' ? 'var(--accent-success)' : 'var(--accent-error)';
+        document.body.style.boxShadow = `inset 0 0 50px ${color}`;
+        setTimeout(() => { document.body.style.boxShadow = 'none'; }, 300);
+    }
+
+    function endGame() {
+        isGameRunning = false;
+        clearTimeout(timer);
+        clearTimeout(hideTimer);
+        matchBtn.disabled = true;
+        letterEl.style.display = 'none';
+        
+        document.getElementById('final-score').innerText = score;
+        document.getElementById('stat-hits').innerText = stats.hits;
+        document.getElementById('stat-wrong').innerText = stats.wrong;
+        document.getElementById('stat-miss').innerText = stats.miss;
+        
+        let comment = "非常稳！";
+        if (stats.miss > 5) comment = "提示：慢速模式下尽量不要漏掉哦。";
+        else if (score > 350) comment = "完美表现！这个速度对你来说太简单了？";
+        
+        document.getElementById('final-comment').innerText = comment;
+        document.getElementById('result-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('result-modal').style.display = 'none';
+        startBtn.style.display = 'block';
+        settingsPanel.style.opacity = '1';
+        progressBar.style.width = "0%";
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.code === 'Space') {
+            event.preventDefault();
+            matchBtn.classList.add('btn-pressed'); 
+            checkMatch();
+        }
+    });
+    document.addEventListener('keyup', function(event) {
+        if (event.code === 'Space') {
+            matchBtn.classList.remove('btn-pressed');
+        }
+    });
+</script>
+</body>
+</html>
