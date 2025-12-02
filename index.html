@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N-Back | 0.8秒神级挑战</title>
+    <title>N-Back | 0.8秒神级挑战 (大屏版)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <style>
         /* --- 极速版 UI (红色警戒风格) --- */
@@ -12,9 +12,9 @@
             --card-bg: rgba(15, 23, 42, 0.8);
             --text-main: #f8fafc;
             --text-sub: #475569;
-            --accent-primary: #f43f5e; /* 激进的红色主调 */
-            --accent-success: #00ff9d; /* 极亮荧光绿 */
-            --accent-error: #ff003c;   /* 警示红 */
+            --accent-primary: #f43f5e;
+            --accent-success: #00ff9d;
+            --accent-error: #ff003c;
             --btn-color: #e2e8f0;
         }
 
@@ -34,7 +34,7 @@
 
         .header {
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -43,8 +43,8 @@
 
         .setting-group {
             background: rgba(255,255,255,0.05);
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 30px;
             border: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -53,8 +53,8 @@
             border: none;
             color: var(--accent-primary);
             font-weight: 900;
-            font-size: 16px;
-            width: 30px;
+            font-size: 20px;
+            width: 40px;
             text-align: center;
         }
         input:focus { outline: none; }
@@ -62,17 +62,16 @@
         .score-tag {
             font-family: monospace;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 24px;
             color: var(--accent-primary);
         }
 
-        /* 进度条：极简细线 */
         .progress-track {
             width: 100%;
-            max-width: 400px;
-            height: 2px;
+            max-width: 500px;
+            height: 4px;
             background: rgba(255,255,255,0.1);
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
         
         .progress-fill {
@@ -83,102 +82,113 @@
             box-shadow: 0 0 15px var(--accent-primary);
         }
 
+        /* --- 核心修改区：变大 --- */
         .game-stage {
             position: relative;
-            width: 240px;
-            height: 240px;
+            /* 尺寸加大 */
+            width: 340px;
+            height: 340px;
             background: var(--card-bg);
-            border-radius: 50%; /* 改为圆形，更聚焦 */
-            border: 2px solid rgba(255,255,255,0.05);
-            box-shadow: 0 0 80px rgba(244, 63, 94, 0.1);
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.08);
+            box-shadow: 0 0 100px rgba(244, 63, 94, 0.15); /* 光晕增强 */
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         #current-letter {
-            font-size: 140px;
+            /* 字体加大 */
+            font-size: 200px;
             font-weight: 900;
             color: white;
             display: none;
-            /* 闪电动画：0.08秒 */
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
             animation: flashIn 0.08s cubic-bezier(0, 0, 0.2, 1);
         }
 
         @keyframes flashIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.1); opacity: 1; }
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.1); opacity: 1; }
             100% { transform: scale(1); opacity: 1; }
         }
 
         #feedback {
             height: 24px;
-            font-size: 16px;
+            font-size: 20px; /* 反馈文字也稍微大点 */
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             opacity: 0;
             transition: opacity 0.05s;
         }
         .show-feedback { opacity: 1 !important; }
-        .text-success { color: var(--accent-success); }
-        .text-error { color: var(--accent-error); }
+        .text-success { color: var(--accent-success); text-shadow: 0 0 20px var(--accent-success); }
+        .text-error { color: var(--accent-error); text-shadow: 0 0 20px var(--accent-error); }
 
         .controls {
             display: flex;
             flex-direction: column;
             gap: 20px;
             align-items: center;
+            width: 100%;
         }
 
+        /* --- 核心修改区：按钮巨大化 --- */
         #match-btn {
-            width: 200px;
-            height: 100px; /* 超大按钮区域，防止点歪 */
-            background: transparent;
-            border: 2px solid var(--btn-color);
-            border-radius: 20px;
+            width: 320px;    /* 宽度大幅增加 */
+            height: 140px;   /* 高度增加，更容易按 */
+            background: rgba(255,255,255,0.03);
+            border: 3px solid var(--btn-color);
+            border-radius: 30px;
             color: var(--btn-color);
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 36px; /* 字体加大 */
+            font-weight: 900;
             cursor: pointer;
-            transition: transform 0.05s, background 0.05s;
+            transition: all 0.05s;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            /* 增加触摸反馈区域 */
+            touch-action: manipulation; 
         }
 
         #match-btn:active, .btn-pressed {
-            background: var(--text-main);
-            color: #000;
-            transform: scale(0.95);
+            background: var(--btn-color);
+            color: #020617;
+            transform: scale(0.96);
+            box-shadow: 0 0 30px var(--btn-color);
         }
         
         #match-btn:disabled {
-            opacity: 0.3;
+            opacity: 0.2;
             cursor: not-allowed;
+            border-color: #475569;
+            color: #475569;
             transform: none;
+            box-shadow: none;
         }
 
         #start-btn {
-            padding: 16px 48px;
+            padding: 18px 60px;
             background: var(--accent-primary);
             color: white;
             border: none;
-            border-radius: 50px;
-            font-size: 18px;
+            border-radius: 60px;
+            font-size: 20px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(244, 63, 94, 0.5);
+            box-shadow: 0 0 30px rgba(244, 63, 94, 0.4);
             transition: transform 0.2s;
         }
-        #start-btn:hover { transform: scale(1.05); }
+        #start-btn:hover { transform: scale(1.05); box-shadow: 0 0 50px rgba(244, 63, 94, 0.6); }
 
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 100;
             justify-content: center;
             align-items: center;
@@ -188,22 +198,23 @@
             background: #0f172a;
             border: 1px solid #334155;
             padding: 40px;
-            border-radius: 24px;
+            border-radius: 30px;
             text-align: center;
-            width: 300px;
+            width: 320px;
         }
 
-        .stat-num { font-size: 32px; font-weight: 900; display: block; }
-        .stat-label { font-size: 12px; color: #64748b; }
+        .stat-num { font-size: 36px; font-weight: 900; display: block; }
+        .stat-label { font-size: 14px; color: #64748b; font-weight: bold;}
         
         .btn-restart {
-            margin-top: 20px;
+            margin-top: 30px;
             width: 100%;
-            padding: 15px;
+            padding: 20px;
             background: white;
             border: none;
-            border-radius: 10px;
-            font-weight: bold;
+            border-radius: 16px;
+            font-weight: 900;
+            font-size: 18px;
             cursor: pointer;
         }
 
@@ -213,7 +224,7 @@
 
     <div class="header">
         <div class="setting-group" id="settings-panel">
-            <span style="color:#fff">N=</span>
+            <span style="color:#fff; font-weight:bold;">N = </span>
             <input type="number" id="n-level" value="2" min="1" max="5">
         </div>
         <div class="score-tag" id="score-display">0</div>
@@ -231,15 +242,15 @@
 
     <div class="controls">
         <button id="match-btn" disabled onmousedown="checkMatch()">
-            MATCH
+            MATCH!
         </button>
-        <button id="start-btn" onclick="startGame()">☠️ 开启神级挑战</button>
+        <button id="start-btn" onclick="startGame()">☠️ 开启挑战</button>
     </div>
 
     <div id="result-modal" class="modal-overlay">
         <div class="modal-card">
             <h2 style="margin:0 0 20px 0; color:#fff;">训练结算</h2>
-            <span style="font-size:60px; font-weight:900; color:var(--accent-primary);" id="final-score">0</span>
+            <span style="font-size:70px; font-weight:900; color:var(--accent-primary);" id="final-score">0</span>
             
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:30px 0;">
                 <div>
@@ -252,8 +263,8 @@
                 </div>
             </div>
             
-            <div style="font-size:12px; color:#64748b; margin-bottom:20px;">
-                漏掉: <span id="stat-miss">0</span>
+            <div style="font-size:14px; color:#64748b; margin-bottom:20px;">
+                漏掉: <span id="stat-miss" style="color:#94a3b8; font-weight:bold;">0</span>
             </div>
 
             <button class="btn-restart" onclick="closeModal()">再来一次</button>
@@ -262,10 +273,9 @@
 
 <script>
     // --- 0.8秒 神级配置 (GOD MODE) ---
-    // 警告：这个速度非常考验神经反射
-    const TOTAL_TRIALS = 60;  // 题量增加
-    const INTERVAL_MS = 800;  // 总周期：0.8秒 (极速)
-    const SHOW_MS = 400;      // 显示时间：0.4秒 (一闪而过)
+    const TOTAL_TRIALS = 60;  
+    const INTERVAL_MS = 800;  // 0.8秒
+    const SHOW_MS = 400;      // 0.4秒显示
     const MATCH_RATE = 0.3;
     const LETTER_POOL = ['A', 'B', 'C', 'H', 'K', 'L', 'M', 'Q', 'R', 'S', 'T', 'X'];
 
@@ -304,18 +314,16 @@
         matchBtn.disabled = false;
         feedbackEl.classList.remove('show-feedback');
         
-        // 预热 300ms 后开始
         setTimeout(nextTurn, 300);
     }
 
     function nextTurn() {
-        // 检查漏掉
         if (currentTrial > 0 && !hasResponded) {
             const lastIndex = sequence.length - 1;
             const targetIndex = lastIndex - nLevel;
             if (targetIndex >= 0 && sequence[lastIndex] === sequence[targetIndex]) {
                 stats.miss++;
-                flashScreen('rgba(255, 200, 0, 0.1)'); // 漏掉时轻微黄光提示
+                flashScreen('rgba(255, 200, 0, 0.1)');
             }
         }
 
@@ -341,9 +349,8 @@
         currentLetter = newChar;
         sequence.push(currentLetter);
         
-        // 极速重绘
         letterEl.style.display = 'none';
-        letterEl.offsetHeight; // Trigger reflow
+        letterEl.offsetHeight; 
         letterEl.innerText = currentLetter;
         letterEl.style.display = 'block';
         
@@ -351,7 +358,6 @@
         const pct = (currentTrial / TOTAL_TRIALS) * 100;
         progressBar.style.width = `${pct}%`;
 
-        // 极速模式下的时间控制
         hideTimer = setTimeout(() => { 
             letterEl.style.display = 'none'; 
         }, SHOW_MS);
@@ -366,14 +372,14 @@
         const targetIndex = sequence.length - 1 - nLevel;
         
         if (targetIndex >= 0 && sequence[targetIndex] === currentLetter) {
-            score += 20; // 难度大，分值高
+            score += 20; 
             stats.hits++;
-            showFeedback("HIT", "text-success");
+            showFeedback("HIT!", "text-success");
             flashScreen('rgba(0, 255, 157, 0.15)');
         } else {
             score -= 10;
             stats.wrong++;
-            showFeedback("WRONG", "text-error");
+            showFeedback("MISS", "text-error");
             flashScreen('rgba(255, 0, 60, 0.2)');
         }
         scoreDisplay.innerText = score;
@@ -383,18 +389,13 @@
         feedbackEl.innerText = text;
         feedbackEl.className = className;
         feedbackEl.classList.add('show-feedback');
-        // 200ms 后自动隐藏，为下一个做准备
         setTimeout(() => feedbackEl.classList.remove('show-feedback'), 200);
     }
 
-    // 屏幕闪光特效
     function flashScreen(color) {
         document.body.style.backgroundColor = color;
-        // 50ms 恢复背景，极短闪烁
         setTimeout(() => {
             document.body.style.backgroundColor = ""; 
-            // 恢复渐变背景需要清空 style.backgroundColor 
-            // css 中 body 有 background 属性
         }, 50);
     }
 
@@ -419,7 +420,7 @@
         progressBar.style.width = "0%";
     }
 
-    // 键盘支持
+    // 键盘支持 (同时触发按钮按下的视觉效果)
     document.addEventListener('keydown', function(event) {
         if (event.code === 'Space') {
             event.preventDefault();
@@ -434,6 +435,19 @@
             matchBtn.classList.remove('btn-pressed');
         }
     });
+    
+    // 移动端优化：触摸防止延迟
+    matchBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault(); // 防止触发两次 click
+        if(isGameRunning) {
+            matchBtn.classList.add('btn-pressed');
+            checkMatch();
+        }
+    });
+    matchBtn.addEventListener('touchend', function(e) {
+        matchBtn.classList.remove('btn-pressed');
+    });
+
 </script>
 </body>
 </html>
