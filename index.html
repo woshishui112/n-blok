@@ -3,26 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N-Back | 2.5秒标准大屏版</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <title>N-Back | 实验室风格</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
-        /* --- 舒适版 UI (回归冷静的深蓝色) --- */
+        /* --- 实验室风格 UI (清爽、明亮、专业) --- */
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --accent-primary: #38bdf8; /* 回归清爽的蓝色 */
-            --accent-success: #4ade80;
-            --accent-error: #f87171;
-            --btn-color: #e2e8f0;
-            --btn-shadow: #94a3b8;
+            --bg-color: #f3f4f6;          /* 柔和背景灰 */
+            --card-bg: #ffffff;           /* 纯白卡片 */
+            --text-main: #111827;         /* 深灰近黑 */
+            --text-sub: #9ca3af;          /* 浅灰 */
+            
+            --primary: #4f46e5;           /* 靛青色 (专业感) */
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            
+            --success: #059669;           /* 翡翠绿 */
+            --error: #dc2626;             /* 砖红 */
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            --radius-lg: 24px;
+            --radius-btn: 16px;
         }
 
         body {
             margin: 0;
             height: 100vh;
-            background: var(--bg-gradient);
+            background-color: var(--bg-color);
+            /* 添加微弱的网格背景，增加实验室感 */
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+            
             color: var(--text-main);
             font-family: 'Inter', system-ui, sans-serif;
             display: flex;
@@ -35,179 +48,201 @@
 
         .header {
             width: 90%;
-            max-width: 500px;
+            max-width: 400px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background: var(--card-bg);
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: var(--shadow-sm);
         }
 
         .setting-group {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.05);
-            padding: 10px 20px;
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
+            gap: 8px;
+            font-weight: 600;
+            color: var(--text-sub);
         }
 
         input[type=number] {
-            background: transparent;
+            background: var(--bg-color);
             border: none;
-            color: var(--accent-primary);
-            font-weight: bold;
-            font-size: 20px;
-            width: 40px;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 18px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
             text-align: center;
         }
-        input:focus { outline: none; }
+        input:focus { outline: 2px solid var(--primary); }
 
         .score-tag {
-            font-weight: bold;
-            font-size: 22px;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--primary);
         }
 
-        .progress-track {
+        /* 进度条：顶部细条 */
+        .progress-container {
             width: 100%;
-            max-width: 500px;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 3px;
-            margin-bottom: 30px;
+            max-width: 400px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin-bottom: 40px;
             overflow: hidden;
         }
         
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: var(--accent-primary);
-            border-radius: 3px;
-            transition: width 0.5s ease; /* 进度条动画也柔和一点 */
+            background: var(--primary);
+            border-radius: 4px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- 保持大屏尺寸 --- */
+        /* --- 游戏主舞台 --- */
         .game-stage {
             position: relative;
-            width: 320px;
-            height: 320px;
+            width: 300px;
+            height: 300px;
             background: var(--card-bg);
-            border-radius: 40px; /* 稍微圆润一点的方块 */
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.08);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border-radius: 40px; /* 方形圆角，像APP图标 */
+            box-shadow: var(--shadow-lg);
+            border: 1px solid #ffffff; /* 高光边框 */
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 30px;
+            transition: transform 0.1s;
         }
 
         #current-letter {
-            font-size: 180px; /* 依然很大，但不出框 */
-            font-weight: 700;
-            background: linear-gradient(180deg, #fff, #cbd5e1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-family: 'Inter', sans-serif;
+            font-size: 160px;
+            font-weight: 900;
+            color: var(--text-main);
             display: none;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
-            /* 柔和的弹出动画：0.3秒 */
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* 干净利落的缩放动画 */
+            animation: scaleUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        @keyframes popIn {
-            0% { transform: scale(0.6); opacity: 0; }
+        @keyframes scaleUp {
+            0% { transform: scale(0.5); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
         #feedback {
-            height: 30px;
-            font-size: 20px;
-            font-weight: 600;
+            height: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: bold;
             letter-spacing: 1px;
             margin-bottom: 20px;
             opacity: 0;
             transition: opacity 0.2s;
+            text-transform: uppercase;
         }
         .show-feedback { opacity: 1 !important; }
-        .text-success { color: var(--accent-success); text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
-        .text-error { color: var(--accent-error); text-shadow: 0 0 10px rgba(248, 113, 113, 0.4); }
+        .text-success { color: var(--success); }
+        .text-error { color: var(--error); }
 
         .controls {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
             width: 100%;
         }
 
-        /* --- 保持大按钮 --- */
+        /* --- 极简大按钮 --- */
         #match-btn {
             position: relative;
-            width: 320px;   /* 宽度 */
-            height: 120px;  /* 高度 */
-            background: var(--btn-color);
+            width: 300px;
+            height: 100px;
+            background: var(--primary);
             border: none;
-            border-radius: 30px;
-            font-size: 28px;
+            border-radius: 20px;
+            color: white;
+            font-size: 24px;
             font-weight: 700;
-            color: #1e293b;
             cursor: pointer;
-            box-shadow: 0 10px 0 var(--btn-shadow), 0 15px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); /* 漂亮的投影 */
             transition: all 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
+            overflow: hidden;
             touch-action: manipulation;
         }
 
+        /* 按钮按下的果冻效果 */
         #match-btn:active, .btn-pressed {
-            transform: translateY(10px);
-            box-shadow: 0 0 0 var(--btn-shadow), 0 0 10px rgba(0,0,0,0.1);
+            transform: scale(0.96);
+            background: var(--primary-hover);
+            box-shadow: 0 4px 10px -2px rgba(79, 70, 229, 0.3);
         }
 
         #match-btn:disabled {
-            background: #475569;
-            color: #94a3b8;
+            background: #d1d5db;
+            color: #9ca3af;
             box-shadow: none;
             cursor: not-allowed;
-            transform: translateY(10px);
+            transform: none;
+        }
+
+        .btn-sub-text {
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
         }
 
         #start-btn {
-            padding: 16px 50px;
-            background: linear-gradient(90deg, var(--accent-primary), #3b82f6);
-            color: white;
-            border: none;
+            background: var(--card-bg);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 14px 40px;
             border-radius: 50px;
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
-        #start-btn:hover { transform: translateY(-2px); }
+        #start-btn:hover { 
+            background: var(--primary); 
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
 
+        /* --- 模态框：干净的弹窗 --- */
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(8px);
+            background: rgba(255,255,255,0.8); /* 白色半透明遮罩 */
+            backdrop-filter: blur(5px);
             z-index: 100;
             justify-content: center;
             align-items: center;
         }
 
         .modal-card {
-            background: rgba(30, 41, 59, 1);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--card-bg);
             padding: 40px;
-            border-radius: 24px;
+            border-radius: 30px;
             text-align: center;
-            width: 340px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 320px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f3f4f6;
         }
 
         .stats-grid {
@@ -218,33 +253,27 @@
         }
 
         .stat-box {
-            background: rgba(255,255,255,0.03);
-            padding: 15px 5px;
+            padding: 10px;
             border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
+            background: #f9fafb;
         }
 
-        .stat-num { display: block; font-size: 28px; font-weight: bold; margin-bottom: 5px; }
-        .stat-label { font-size: 12px; color: var(--text-sub); text-transform: uppercase; }
+        .stat-num { display: block; font-size: 24px; font-weight: 900; color: var(--text-main); }
+        .stat-label { font-size: 12px; color: var(--text-sub); font-weight: 600; margin-top: 4px; }
 
         .btn-restart {
             width: 100%;
-            padding: 18px;
-            background: white;
-            color: #0f172a;
+            padding: 16px;
+            background: var(--text-main);
+            color: white;
             border: none;
-            border-radius: 16px;
+            border-radius: 14px;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
+            transition: opacity 0.2s;
         }
-        .key-hint {
-            font-size: 14px;
-            background: rgba(0,0,0,0.1);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: normal;
-        }
+        .btn-restart:hover { opacity: 0.9; }
 
     </style>
 </head>
@@ -252,13 +281,13 @@
 
     <div class="header">
         <div class="setting-group" id="settings-panel">
-            <span style="font-size:16px; color:var(--text-sub)">N-Level</span>
+            <span>N-BACK</span>
             <input type="number" id="n-level" value="2" min="1" max="5">
         </div>
-        <div class="score-tag" id="score-display">SCORE: 0</div>
+        <div class="score-tag" id="score-display">000</div>
     </div>
 
-    <div class="progress-track">
+    <div class="progress-container">
         <div class="progress-fill" id="progress-bar"></div>
     </div>
 
@@ -270,50 +299,48 @@
 
     <div class="controls">
         <button id="match-btn" disabled onmousedown="checkMatch()">
-            <span>🎯 匹配</span>
-            <span class="key-hint">SPACE</span>
+            <span>MATCH</span>
+            <span class="btn-sub-text">SPACE</span>
         </button>
-        <button id="start-btn" onclick="startGame()">开始训练</button>
+        <button id="start-btn" onclick="startGame()">Start Training</button>
     </div>
 
     <div id="result-modal" class="modal-overlay">
         <div class="modal-card">
-            <h2 style="margin:0; font-size:26px;">训练完成</h2>
-            <p style="color:var(--text-sub); font-size:15px; margin-top:5px;">2.5秒标准模式</p>
-
-            <div style="margin: 25px 0;">
-                <span style="font-size:56px; font-weight:700; color:var(--accent-primary);" id="final-score">0</span>
-                <div style="font-size:14px; color:var(--text-sub);">总分</div>
+            <h2 style="margin:0; font-size:22px; color:var(--text-sub);">SESSION REPORT</h2>
+            
+            <div style="margin: 20px 0;">
+                <span style="font-size:60px; font-weight:900; color:var(--primary); letter-spacing: -2px;" id="final-score">0</span>
+                <div style="font-size:14px; font-weight:600; color:var(--text-sub);">TOTAL SCORE</div>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-box">
-                    <span class="stat-num" style="color:var(--accent-success)" id="stat-hits">0</span>
-                    <span class="stat-label">命中</span>
+                    <span class="stat-num" style="color:var(--success)" id="stat-hits">0</span>
+                    <span class="stat-label">HITS</span>
                 </div>
                 <div class="stat-box">
-                    <span class="stat-num" style="color:var(--accent-error)" id="stat-wrong">0</span>
-                    <span class="stat-label">误触</span>
+                    <span class="stat-num" style="color:var(--error)" id="stat-wrong">0</span>
+                    <span class="stat-label">WRONG</span>
                 </div>
                 <div class="stat-box">
-                    <span class="stat-num" style="color:#fbbf24" id="stat-miss">0</span>
-                    <span class="stat-label">漏掉</span>
+                    <span class="stat-num" style="color:#f59e0b" id="stat-miss">0</span>
+                    <span class="stat-label">MISS</span>
                 </div>
             </div>
 
-            <button class="btn-restart" onclick="closeModal()">再次挑战</button>
+            <button class="btn-restart" onclick="closeModal()">Play Again</button>
         </div>
     </div>
 
 <script>
-    // --- 2.5秒 标准训练版配置 ---
-    const TOTAL_TRIALS = 40;  // 题量适中
-    const INTERVAL_MS = 2500; // 总周期：2.5秒 (舒适节奏)
-    const SHOW_MS = 1500;     // 显示时间：1.5秒 (看得清) - 留1秒处理空白期
-    const MATCH_RATE = 0.3;   // 30% 匹配率
+    // --- 逻辑保持不变：2.5秒标准节奏 ---
+    const TOTAL_TRIALS = 40;
+    const INTERVAL_MS = 2500; // 2.5秒
+    const SHOW_MS = 1500;     // 1.5秒显示
+    const MATCH_RATE = 0.3;
     const LETTER_POOL = ['A', 'B', 'C', 'H', 'K', 'L', 'M', 'Q', 'R', 'S', 'T', 'X'];
 
-    // 状态管理
     let nLevel = 2;
     let sequence = [];
     let currentTrial = 0;
@@ -342,19 +369,16 @@
         stats = { hits: 0, wrong: 0, miss: 0 };
         isGameRunning = true;
         
-        scoreDisplay.innerText = "SCORE: 0";
+        scoreDisplay.innerText = "000";
         progressBar.style.width = "0%";
         startBtn.style.display = 'none';
-        settingsPanel.style.opacity = '0.5';
         matchBtn.disabled = false;
         feedbackEl.classList.remove('show-feedback');
         
-        // 稍微等待一下再开始，给人准备时间
         setTimeout(nextTurn, 500);
     }
 
     function nextTurn() {
-        // 检测上一轮是否漏掉
         if (currentTrial > 0 && !hasResponded) {
             const lastIndex = sequence.length - 1;
             const targetIndex = lastIndex - nLevel;
@@ -372,21 +396,18 @@
         feedbackEl.classList.remove('show-feedback');
         
         let newChar;
-        // 生成逻辑
         if (sequence.length >= nLevel && Math.random() < MATCH_RATE) {
             newChar = sequence[sequence.length - nLevel]; 
         } else {
-            // 简单随机
             newChar = LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
         }
         
         currentLetter = newChar;
         sequence.push(currentLetter);
         
-        // 动画重置
-        letterEl.classList.remove('animating');
-        void letterEl.offsetWidth; 
-        
+        // 动画重置技巧
+        letterEl.style.display = 'none';
+        letterEl.offsetHeight; // 强制重绘
         letterEl.innerText = currentLetter;
         letterEl.style.display = 'block';
         
@@ -394,9 +415,7 @@
         const pct = (currentTrial / TOTAL_TRIALS) * 100;
         progressBar.style.width = `${pct}%`;
 
-        // 字母显示时间
         hideTimer = setTimeout(() => { letterEl.style.display = 'none'; }, SHOW_MS);
-        // 下一轮时间
         timer = setTimeout(nextTurn, INTERVAL_MS);
     }
 
@@ -409,15 +428,15 @@
         if (targetIndex >= 0 && sequence[targetIndex] === currentLetter) {
             score += 10;
             stats.hits++;
-            showFeedback("✨ 完美匹配", "text-success");
-            triggerGlow("success");
+            showFeedback("Correct", "text-success");
+            flashScreen('rgba(5, 150, 105, 0.1)'); // 绿色闪烁
         } else {
             score -= 5;
             stats.wrong++;
-            showFeedback("❌ 误触", "text-error");
-            triggerGlow("error");
+            showFeedback("Wrong", "text-error");
+            flashScreen('rgba(220, 38, 38, 0.1)'); // 红色闪烁
         }
-        scoreDisplay.innerText = `SCORE: ${score}`;
+        scoreDisplay.innerText = score.toString().padStart(3, '0');
     }
 
     function showFeedback(text, className) {
@@ -426,10 +445,11 @@
         feedbackEl.classList.add('show-feedback');
     }
 
-    function triggerGlow(type) {
-        const color = type === 'success' ? 'rgba(74, 222, 128, 0.2)' : 'rgba(248, 113, 113, 0.2)';
-        document.body.style.boxShadow = `inset 0 0 100px ${color}`;
-        setTimeout(() => { document.body.style.boxShadow = 'none'; }, 300);
+    function flashScreen(color) {
+        document.body.style.backgroundColor = color;
+        setTimeout(() => {
+            document.body.style.backgroundColor = "var(--bg-color)";
+        }, 150);
     }
 
     function endGame() {
@@ -449,11 +469,10 @@
     function closeModal() {
         document.getElementById('result-modal').style.display = 'none';
         startBtn.style.display = 'block';
-        settingsPanel.style.opacity = '1';
         progressBar.style.width = "0%";
     }
 
-    // 键盘
+    // 键盘监听
     document.addEventListener('keydown', function(event) {
         if (event.code === 'Space') {
             event.preventDefault();
@@ -468,10 +487,10 @@
             matchBtn.classList.remove('btn-pressed');
         }
     });
-
+    
     // 触摸优化
     matchBtn.addEventListener('touchstart', function(e) {
-        e.preventDefault(); 
+        e.preventDefault();
         if(isGameRunning) {
             matchBtn.classList.add('btn-pressed');
             checkMatch();
