@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N-Back Pro | 3秒标准版</title>
+    <title>N-Back Pro | 1.5秒疾速版</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* --- 全局变量与UI设计 (深色专注模式) --- */
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --bg-gradient: linear-gradient(135deg, #020617 0%, #0f172a 100%); /* 更深的背景 */
             --card-bg: rgba(30, 41, 59, 0.7);
             --text-main: #f8fafc;
-            --text-sub: #94a3b8;
+            --text-sub: #64748b;
             --accent-primary: #38bdf8;
-            --accent-success: #4ade80;
-            --accent-error: #f87171;
-            --btn-color: #e2e8f0;
-            --btn-shadow: #94a3b8;
+            --accent-success: #22c55e; /* 更鲜艳的绿 */
+            --accent-error: #ef4444;   /* 更鲜艳的红 */
+            --btn-color: #f1f5f9;
+            --btn-shadow: #64748b;
         }
 
         body {
@@ -72,8 +72,8 @@
         .progress-track {
             width: 100%;
             max-width: 400px;
-            height: 6px;
-            background: rgba(255,255,255,0.1);
+            height: 4px; /* 进度条变细一点 */
+            background: rgba(255,255,255,0.05);
             border-radius: 3px;
             margin-bottom: 40px;
             overflow: hidden;
@@ -83,9 +83,9 @@
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-success));
+            background: var(--accent-primary);
             border-radius: 3px;
-            transition: width 0.5s ease;
+            transition: width 0.3s linear; /* 线性动画，看起来更连贯 */
             box-shadow: 0 0 10px var(--accent-primary);
         }
 
@@ -97,7 +97,7 @@
             border-radius: 30px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(255,255,255,0.05);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -105,33 +105,34 @@
         }
 
         #current-letter {
-            font-size: 120px;
+            font-size: 130px;
             font-weight: 700;
-            background: linear-gradient(180deg, #fff, #cbd5e1);
+            background: linear-gradient(180deg, #fff, #94a3b8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: none;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+            /* 极速动画：0.15秒 */
+            animation: popIn 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes popIn {
-            0% { transform: scale(0.6); opacity: 0; }
+            0% { transform: scale(0.4); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
 
         #feedback {
             height: 30px;
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 1px;
             margin-bottom: 20px;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.1s; /* 反馈消失得更快 */
         }
         .show-feedback { opacity: 1 !important; }
-        .text-success { color: var(--accent-success); text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
-        .text-error { color: var(--accent-error); text-shadow: 0 0 10px rgba(248, 113, 113, 0.4); }
+        .text-success { color: var(--accent-success); text-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+        .text-error { color: var(--accent-error); text-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
 
         .controls {
             display: flex;
@@ -149,10 +150,10 @@
             border-radius: 36px;
             font-size: 20px;
             font-weight: 700;
-            color: #1e293b;
+            color: #0f172a;
             cursor: pointer;
-            box-shadow: 0 8px 0 var(--btn-shadow), 0 15px 20px rgba(0,0,0,0.2);
-            transition: all 0.1s;
+            box-shadow: 0 6px 0 var(--btn-shadow), 0 15px 20px rgba(0,0,0,0.2);
+            transition: all 0.05s; /* 按钮响应更快 */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -161,12 +162,12 @@
 
         #match-btn:active, .btn-pressed {
             transform: translateY(6px);
-            box-shadow: 0 2px 0 var(--btn-shadow), 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 0 var(--btn-shadow), 0 0 10px rgba(0,0,0,0.1);
         }
 
         #match-btn:disabled {
-            background: #475569;
-            color: #94a3b8;
+            background: #334155;
+            color: #64748b;
             box-shadow: none;
             cursor: not-allowed;
             transform: translateY(6px);
@@ -174,7 +175,7 @@
 
         #start-btn {
             padding: 14px 40px;
-            background: linear-gradient(90deg, var(--accent-primary), #3b82f6);
+            background: linear-gradient(90deg, var(--accent-primary), #2563eb);
             color: white;
             border: none;
             border-radius: 50px;
@@ -190,16 +191,16 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(8px);
+            background: rgba(2, 6, 23, 0.9);
+            backdrop-filter: blur(5px);
             z-index: 100;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.3s;
+            animation: fadeIn 0.2s;
         }
 
         .modal-card {
-            background: rgba(30, 41, 59, 0.9);
+            background: #1e293b;
             border: 1px solid rgba(255,255,255,0.1);
             padding: 40px;
             border-radius: 24px;
@@ -216,7 +217,7 @@
         }
 
         .stat-box {
-            background: rgba(255,255,255,0.03);
+            background: rgba(0,0,0,0.2);
             padding: 15px 5px;
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.05);
@@ -276,13 +277,13 @@
             <span>🎯 匹配</span>
             <span class="key-hint">SPACE</span>
         </button>
-        <button id="start-btn" onclick="startGame()">开始训练</button>
+        <button id="start-btn" onclick="startGame()">开始疾速训练</button>
     </div>
 
     <div id="result-modal" class="modal-overlay">
         <div class="modal-card">
             <h2 style="margin:0; font-size:24px;">训练报告</h2>
-            <p style="color:var(--text-sub); font-size:14px; margin-top:5px;">本次专注力表现</p>
+            <p style="color:var(--text-sub); font-size:14px; margin-top:5px;">1.5秒疾速模式</p>
 
             <div style="margin: 20px 0;">
                 <span style="font-size:48px; font-weight:700; color:var(--accent-primary);" id="final-score">0</span>
@@ -311,11 +312,11 @@
     </div>
 
 <script>
-    // --- 3秒黄金标准配置 ---
+    // --- 疾速版配置 (Hardcore Mode) ---
     const TOTAL_TRIALS = 50;
-    const INTERVAL_MS = 2200; // 总周期：3秒
-    const SHOW_MS = 2000;     // 显示：2秒 (留1秒处理空白期)
-    const MATCH_RATE = 0.3;
+    const INTERVAL_MS = 1500; // 总周期：1.5秒 (极快节奏)
+    const SHOW_MS = 1100;     // 显示时间：1.1秒 (留0.4秒空白，制造闪烁感)
+    const MATCH_RATE = 0.3;   // 30% 匹配率
     const LETTER_POOL = ['A', 'B', 'C', 'H', 'K', 'L', 'M', 'Q', 'R', 'S', 'T', 'X'];
 
     // 状态管理
@@ -327,6 +328,7 @@
 
     let timer = null;
     let hideTimer = null;
+    let feedbackTimer = null;
     let isGameRunning = false;
     let hasResponded = false;
     let currentLetter = "";
@@ -359,7 +361,7 @@
     }
 
     function nextTurn() {
-        // 检测漏掉
+        // 检测上一轮是否漏掉
         if (currentTrial > 0 && !hasResponded) {
             const lastIndex = sequence.length - 1;
             const targetIndex = lastIndex - nLevel;
@@ -374,17 +376,28 @@
         }
 
         hasResponded = false;
+        // 快速清除反馈文字，避免干扰
         feedbackEl.classList.remove('show-feedback');
         
         let newChar;
+        // 确保匹配率逻辑
         if (sequence.length >= nLevel && Math.random() < MATCH_RATE) {
             newChar = sequence[sequence.length - nLevel]; 
         } else {
-            newChar = LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
+            // 避免连续产生相同的（除非是N-Back需要）
+            let candidate;
+            do {
+                candidate = LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
+            } while (sequence.length > 0 && candidate === sequence[sequence.length-1] && nLevel > 1);
+            newChar = candidate;
         }
         
         currentLetter = newChar;
         sequence.push(currentLetter);
+        
+        // 强制重绘动画：移除 -> 强制回流 -> 添加
+        letterEl.classList.remove('animating');
+        void letterEl.offsetWidth; // 触发 reflow
         
         letterEl.innerText = currentLetter;
         letterEl.style.display = 'block';
@@ -393,9 +406,12 @@
         const pct = (currentTrial / TOTAL_TRIALS) * 100;
         progressBar.style.width = `${pct}%`;
 
-        // 显示时间结束
-        hideTimer = setTimeout(() => { letterEl.style.display = 'none'; }, SHOW_MS);
-        // 下一题时间
+        // 字母消失定时器
+        hideTimer = setTimeout(() => { 
+            letterEl.style.display = 'none'; 
+        }, SHOW_MS);
+
+        // 下一题总定时器
         timer = setTimeout(nextTurn, INTERVAL_MS);
     }
 
@@ -405,10 +421,11 @@
 
         const targetIndex = sequence.length - 1 - nLevel;
         
+        // 核心逻辑判断
         if (targetIndex >= 0 && sequence[targetIndex] === currentLetter) {
             score += 10;
             stats.hits++;
-            showFeedback("✨ 完美匹配", "text-success");
+            showFeedback("⚡ 命中!", "text-success");
             triggerGlow("success");
         } else {
             score -= 5;
@@ -420,15 +437,21 @@
     }
 
     function showFeedback(text, className) {
+        clearTimeout(feedbackTimer);
         feedbackEl.innerText = text;
         feedbackEl.className = className;
         feedbackEl.classList.add('show-feedback');
+        // 反馈显示时间缩短
+        feedbackTimer = setTimeout(() => {
+            feedbackEl.classList.remove('show-feedback');
+        }, 800);
     }
 
     function triggerGlow(type) {
         const color = type === 'success' ? 'var(--accent-success)' : 'var(--accent-error)';
-        document.body.style.boxShadow = `inset 0 0 50px ${color}`;
-        setTimeout(() => { document.body.style.boxShadow = 'none'; }, 300);
+        // 边框闪烁更快
+        document.body.style.boxShadow = `inset 0 0 60px ${color}`;
+        setTimeout(() => { document.body.style.boxShadow = 'none'; }, 200);
     }
 
     function endGame() {
@@ -443,10 +466,10 @@
         document.getElementById('stat-wrong').innerText = stats.wrong;
         document.getElementById('stat-miss').innerText = stats.miss;
         
-        let comment = "继续保持！";
-        if (stats.miss > 10) comment = "提示：漏掉较多，尝试用内心的声音默念字母。";
-        else if (stats.wrong > 10) comment = "提示：别急，看准了再下手。";
-        else if (score > 350) comment = "状态神勇！你的大脑现在非常敏锐！";
+        let comment = "速度很快，继续保持！";
+        if (stats.miss > 10) comment = "跟不上节奏？尝试降低N值或多加练习。";
+        else if (stats.wrong > 10) comment = "手太快了？在疾速模式下更要保持冷静。";
+        else if (score > 400) comment = "太强了！你的大脑反应速度惊人！";
         
         document.getElementById('final-comment').innerText = comment;
         document.getElementById('result-modal').style.display = 'flex';
@@ -459,9 +482,11 @@
         progressBar.style.width = "0%";
     }
 
+    // 键盘监听优化
     document.addEventListener('keydown', function(event) {
         if (event.code === 'Space') {
-            event.preventDefault();
+            event.preventDefault(); // 防止滚动
+            if(!isGameRunning) return; 
             matchBtn.classList.add('btn-pressed'); 
             checkMatch();
         }
@@ -474,4 +499,3 @@
 </script>
 </body>
 </html>
-
