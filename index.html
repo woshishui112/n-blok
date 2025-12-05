@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>N-Back | 实验室风格</title>
+    <title>N-Back | 实验室风格 (Fast)</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         /* --- 实验室风格 UI (清爽、明亮、专业) --- */
         :root {
-            --bg-color: #f3f4f6;          /* 柔和背景灰 */
-            --card-bg: #ffffff;           /* 纯白卡片 */
-            --text-main: #111827;         /* 深灰近黑 */
-            --text-sub: #9ca3af;          /* 浅灰 */
+            --bg-color: #f3f4f6;          
+            --card-bg: #ffffff;           
+            --text-main: #111827;         
+            --text-sub: #9ca3af;          
             
-            --primary: #4f46e5;           /* 靛青色 (专业感) */
+            --primary: #4f46e5;           
             --primary-hover: #4338ca;
             --primary-light: #e0e7ff;
             
-            --success: #059669;           /* 翡翠绿 */
-            --error: #dc2626;             /* 砖红 */
+            --success: #059669;           
+            --error: #dc2626;             
             
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -32,10 +32,8 @@
             margin: 0;
             height: 100vh;
             background-color: var(--bg-color);
-            /* 添加微弱的网格背景，增加实验室感 */
             background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
             background-size: 20px 20px;
-            
             color: var(--text-main);
             font-family: 'Inter', system-ui, sans-serif;
             display: flex;
@@ -88,7 +86,6 @@
             color: var(--primary);
         }
 
-        /* 进度条：顶部细条 */
         .progress-container {
             width: 100%;
             max-width: 400px;
@@ -107,15 +104,14 @@
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- 游戏主舞台 --- */
         .game-stage {
             position: relative;
             width: 300px;
             height: 300px;
             background: var(--card-bg);
-            border-radius: 40px; /* 方形圆角，像APP图标 */
+            border-radius: 40px;
             box-shadow: var(--shadow-lg);
-            border: 1px solid #ffffff; /* 高光边框 */
+            border: 1px solid #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -129,8 +125,8 @@
             font-weight: 900;
             color: var(--text-main);
             display: none;
-            /* 干净利落的缩放动画 */
-            animation: scaleUp 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            /* 动画稍微加快，配合快节奏 */
+            animation: scaleUp 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         @keyframes scaleUp {
@@ -161,7 +157,6 @@
             width: 100%;
         }
 
-        /* --- 极简大按钮 --- */
         #match-btn {
             position: relative;
             width: 300px;
@@ -173,7 +168,7 @@
             font-size: 24px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); /* 漂亮的投影 */
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
             transition: all 0.1s;
             display: flex;
             align-items: center;
@@ -183,7 +178,6 @@
             touch-action: manipulation;
         }
 
-        /* 按钮按下的果冻效果 */
         #match-btn:active, .btn-pressed {
             transform: scale(0.96);
             background: var(--primary-hover);
@@ -223,12 +217,11 @@
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
         }
 
-        /* --- 模态框：干净的弹窗 --- */
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8); /* 白色半透明遮罩 */
+            background: rgba(255,255,255,0.8);
             backdrop-filter: blur(5px);
             z-index: 100;
             justify-content: center;
@@ -334,10 +327,10 @@
     </div>
 
 <script>
-    // --- 逻辑保持不变：2.5秒标准节奏 ---
+    // --- 速度设置 ---
     const TOTAL_TRIALS = 40;
-    const INTERVAL_MS = 2500; // 2.5秒
-    const SHOW_MS = 1500;     // 1.5秒显示
+    const INTERVAL_MS = 2000; // 修改：从 2500ms 改为 2000ms (2秒一回合，标准速度)
+    const SHOW_MS = 1000;     // 修改：从 1500ms 改为 1000ms (字母显示1秒，空白1秒)
     const MATCH_RATE = 0.3;
     const LETTER_POOL = ['A', 'B', 'C', 'H', 'K', 'L', 'M', 'Q', 'R', 'S', 'T', 'X'];
 
@@ -405,7 +398,7 @@
         currentLetter = newChar;
         sequence.push(currentLetter);
         
-        // 动画重置技巧
+        // 动画重置
         letterEl.style.display = 'none';
         letterEl.offsetHeight; // 强制重绘
         letterEl.innerText = currentLetter;
@@ -415,7 +408,9 @@
         const pct = (currentTrial / TOTAL_TRIALS) * 100;
         progressBar.style.width = `${pct}%`;
 
+        // 隐藏字母的定时器
         hideTimer = setTimeout(() => { letterEl.style.display = 'none'; }, SHOW_MS);
+        // 下一回合的定时器
         timer = setTimeout(nextTurn, INTERVAL_MS);
     }
 
